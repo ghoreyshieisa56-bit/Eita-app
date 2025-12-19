@@ -1,32 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>انتقال فایل به ابر ایتا</title>
+    <title>ابرِ ایتا | انتقال فایل</title>
     <style>
-        body { font-family: Tahoma; direction: rtl; text-align: center; padding: 20px; background: #f4f4f4; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
-        button { background: #0088cc; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        #result { margin-top: 20px; padding: 10px; background: white; display: none; border-radius: 5px; }
+        :root { --eitaa-blue: #0088cc; --eitaa-bg: #f0f2f5; }
+        body { font-family: 'Tahoma', sans-serif; background-color: var(--eitaa-bg); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; color: #333; }
+        .container { background: white; width: 90%; max-width: 400px; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        h2 { color: var(--eitaa-blue); margin-bottom: 10px; font-size: 1.2rem; }
+        p { font-size: 0.9rem; color: #666; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--eitaa-blue); }
+        button { width: 100%; background: var(--eitaa-blue); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #0077b5; }
+        #result { margin-top: 20px; padding: 15px; border-radius: 8px; display: none; font-size: 0.85rem; line-height: 1.6; }
+        .success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--eitaa-blue); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-left: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <h3>دستیار انتقال فایل ایتا</h3>
-    <p>لینک فایل را وارد کنید تا مستقیم در فضای ابری ذخیره شود:</p>
-    <input type="text" id="fileLink" placeholder="http://example.com/file.zip">
-    <button onclick="transferFile()">شروع انتقال</button>
+    <div class="container">
+        <h2>☁️ دستیار انتقال به ابر ایتا</h2>
+        <p>لینک فایل را وارد کنید تا مستقیم به فضای ابری شما منتقل شود.</p>
+        
+        <input type="text" id="fileLink" placeholder="لینک فایل را اینجا بچسبانید...">
+        <button onclick="transferFile()" id="btnText">شروع انتقال فایل</button>
 
-    <div id="result"></div>
+        <div id="result"></div>
+    </div>
 
     <script>
         async function transferFile() {
             const link = document.getElementById('fileLink').value;
             const resultDiv = document.getElementById('result');
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = 'در حال انتقال... لطفاً شکیبا باشید.';
+            const btn = document.getElementById('btnText');
+            
+            if(!link) { alert("لطفاً لینک را وارد کنید"); return; }
 
-            const webAppUrl = "https://script.google.com/macros/s/AKfycbxbD2I_mGLdt6oIjrcZnqanopCe_hCYyLB2F0JZRMT9VHeS0iP-iTIEVxbnPt4NWWm0hw/exec";
+            resultDiv.style.display = 'block';
+            resultDiv.className = '';
+            resultDiv.innerHTML = '<span class="loader"></span> در حال پردازش و انتقال...';
+            btn.disabled = true;
+
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbxbD2I_mGLdt6oIjrcZnqanopCe_hCYyLB2F0JZRMT9VHeS0iP-iTIEVxbnPt4NWWm0hw/exec"; // فراموش نشود!
 
             try {
                 const response = await fetch(webAppUrl, {
@@ -34,13 +53,19 @@
                     body: JSON.stringify({ url: link })
                 });
                 const res = await response.json();
+                
                 if(res.status === "success") {
-                    resultDiv.innerHTML = `✅ موفق! <br> نام: ${res.fileName} <br> حجم: ${res.fileSize} <br> <a href="${res.downloadUrl}">دریافت فایل در ایتا</a>`;
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML = `✅ <b>انتقال با موفقیت انجام شد!</b><br>📦 نام: ${res.fileName}<br>⚖️ حجم: ${res.fileSize}<br><br><a href="${res.downloadUrl}" style="color:#1565c0; font-weight:bold;">📥 دریافت فایل در ایتا</a>`;
                 } else {
-                    resultDiv.innerHTML = "❌ خطا: لینک معتبر نیست یا فایل خیلی سنگین است.";
+                    resultDiv.className = 'error';
+                    resultDiv.innerHTML = "❌ خطا: لینک نامعتبر است یا سرور گوگل پاسخ نمی‌دهد.";
                 }
             } catch (e) {
-                resultDiv.innerHTML = "❌ خطا در برقراری ارتباط با سرور ابری.";
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = "❌ خطا در اتصال به سرور ابری.";
+            } finally {
+                btn.disabled = false;
             }
         }
     </script>
