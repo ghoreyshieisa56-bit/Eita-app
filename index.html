@@ -48,8 +48,9 @@
             const webAppUrl = " https://script.google.com/macros/s/AKfycbxbD2I_mGLdt6oIjrcZnqanopCe_hCYyLB2F0JZRMT9VHeS0iP-iTIEVxbnPt4NWWm0hw/exec"; // فراموش نشود!
 
             try {
-                const response = await fetch(webAppUrl, {
-                    method: 'POST',
+                const response = await fetch(webAppUrl + "?url=" + encodeURIComponent(link), {
+    method: 'GET'
+});
                     body: JSON.stringify({ url: link })
                 });
                 const res = await response.json();
