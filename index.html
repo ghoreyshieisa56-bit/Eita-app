@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>انتقال فایل به ابر ایتا</title>
+    <style>
+        body { font-family: Tahoma; direction: rtl; text-align: center; padding: 20px; background: #f4f4f4; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
+        button { background: #0088cc; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        #result { margin-top: 20px; padding: 10px; background: white; display: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h3>دستیار انتقال فایل ایتا</h3>
+    <p>لینک فایل را وارد کنید تا مستقیم در فضای ابری ذخیره شود:</p>
+    <input type="text" id="fileLink" placeholder="http://example.com/file.zip">
+    <button onclick="transferFile()">شروع انتقال</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function transferFile() {
+            const link = document.getElementById('fileLink').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'در حال انتقال... لطفاً شکیبا باشید.';
+
+            const webAppUrl = "لینک_گوگل_اسکریپت_شما_اینجا";
+
+            try {
+                const response = await fetch(webAppUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ url: link })
+                });
+                const res = await response.json();
+                if(res.status === "success") {
+                    resultDiv.innerHTML = `✅ موفق! <br> نام: ${res.fileName} <br> حجم: ${res.fileSize} <br> <a href="${res.downloadUrl}">دریافت فایل در ایتا</a>`;
+                } else {
+                    resultDiv.innerHTML = "❌ خطا: لینک معتبر نیست یا فایل خیلی سنگین است.";
+                }
+            } catch (e) {
+                resultDiv.innerHTML = "❌ خطا در برقراری ارتباط با سرور ابری.";
+            }
+        }
+    </script>
+</body>
+</html>
